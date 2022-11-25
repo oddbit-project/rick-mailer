@@ -1,5 +1,4 @@
-# Mail backends shipped with Django.
-from rick.base import Container
+from rick.util.misc import optional
 
 from .base import BaseEmailBackend, registry
 from .console import ConsoleEmailBackend
@@ -7,17 +6,17 @@ from .smtp import SMTPEmailBackend
 from .locmem import MemEmailBackend
 
 
-def SMTPFactory(cfg: Container, fail_silently=False) -> SMTPEmailBackend:
+def SMTPFactory(cfg: dict, fail_silently=False) -> SMTPEmailBackend:
     cls = registry.get("smtp")
     return cls(
-        host=cfg.get("smtp_host", "localhost"),
-        port=cfg.get("smtp_port", 25),
-        username=cfg.get("smtp_username", ""),
-        password=cfg.get("smtp_password", ""),
-        use_tls=cfg.get("smtp_use_tls", False),
+        host=optional("smtp_host", cfg, "localhost"),
+        port=optional("smtp_port", cfg, 25),
+        username=optional("smtp_username", cfg, ""),
+        password=optional("smtp_password", cfg, ""),
+        use_tls=optional("smtp_use_tls", cfg, False),
         fail_silently=fail_silently,
-        use_ssl=cfg.get("smtp_use_ssl", False),
-        timeout=cfg.get("smtp_timeout", None),
-        ssl_keyfile=cfg.get("smtp_ssl_keyfile"),
-        ssl_certfile=cfg.get("smtp_ssl_certfile"),
+        use_ssl=optional("smtp_use_ssl", cfg, False),
+        timeout=optional("smtp_timeout", cfg, None),
+        ssl_keyfile=optional("smtp_ssl_keyfile", cfg),
+        ssl_certfile=optional("smtp_ssl_certfile", cfg),
     )

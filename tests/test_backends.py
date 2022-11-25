@@ -9,7 +9,6 @@ from ssl import SSLError
 
 import pytest
 from aiosmtpd.controller import Controller
-from rick.base import MutableContainer
 
 import rick_mailer
 from rick_mailer.backends import SMTPEmailBackend
@@ -376,12 +375,10 @@ class BaseSMTPBackendTest(BaseBackendTest):
             hostname="127.0.0.1",
             port=port,
         )
-        self.config = MutableContainer(
-            {
+        self.config = {
                 'smtp_host': '127.0.0.1',
                 'smtp_port': port
             }
-        )
         self.smtp_controller.start()
 
     def teardown_method(self, test_method):
