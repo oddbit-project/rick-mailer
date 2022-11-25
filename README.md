@@ -1,5 +1,4 @@
-Rick-mailer - SMTP Client
---
+# Rick-mailer - SMTP Client
 
 
 [![Tests](https://github.com/oddbit-project/rick-mailer/workflows/Tests/badge.svg?branch=master)](https://github.com/oddbit-project/rick-mailer/actions)
@@ -10,6 +9,7 @@ Rick-mailer - SMTP Client
 rick_mailer is a standalone version of Django's email client implementation, with minor changes. 
 
 ## Installation
+
 ```shell
 $ pip3 install rick-mailer
 ```
