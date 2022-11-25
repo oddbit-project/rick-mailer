@@ -14,7 +14,6 @@ from .message import (
     make_msgid,
 )
 from .utils import DNS_NAME, CachedDnsName
-from .version import __version__
 
 __all__ = [
     "CachedDnsName",
@@ -29,7 +28,7 @@ __all__ = [
     "forbid_multi_line_headers",
     "Mailer",
     "SMTPFactory",
-    "__version__",
+    "Mailer"
 ]
 
 
@@ -38,7 +37,7 @@ class Mailer:
         self.backend = backend
 
     def send_mail(
-        self, subject, message, from_email, recipient_list, html_message=None
+            self, subject, message, from_email, recipient_list, html_message=None
     ):
         """
         Easy wrapper for sending a single message to a recipient list. All members

@@ -4,8 +4,7 @@ repo_url: https://github.com/oddbit-project/rick-mailer
 repo_name: oddbit-project/rick-mailer
 nav:
   - Tutorial: index.md
-  - Contributing: contributing.md
-  - Changelog: changelog.md
+
 theme:
   name: material
   palette:
@@ -24,7 +23,4 @@ plugins:
   - include-markdown
   - search:
       lang: en
-  - mkdocstrings:
-      watch:
-        - rick-mailer
 

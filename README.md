@@ -17,4 +17,4 @@ As rick_mailer is mostly Django code, it is licensed under Django license and co
 
 ## Documentation
 
-Project documentation can be found on the [Documentation](https://oddbit-project.github.io/rick_mailer/) website.
+Project documentation can be found on the [Documentation](https://oddbit-project.github.io/rick-mailer/) website.
