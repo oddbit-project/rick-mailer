@@ -100,6 +100,7 @@ class BaseBackendTest(HeadersCheckMixin):
         # send_messages() may take a list or an iterator.
         emails_lists = ([email1, email2], iter((email1, email2)))
         for emails_list in emails_lists:
+            self.flush_mailbox()
             num_sent = self.email_backend.send_messages(emails_list)
             assert num_sent == 2
             messages = self.get_mailbox_content()
