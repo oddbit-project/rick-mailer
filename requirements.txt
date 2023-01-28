@@ -1,1 +1,1 @@
-rick~=0.4.6
+git+https://git.oddbit.org/OddBit/rick.git

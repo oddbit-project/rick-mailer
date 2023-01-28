@@ -1,7 +1,7 @@
 site_name: Rick-Mailer
-site_url: https://oddbit-project.github.io/rick-mailer
-repo_url: https://github.com/oddbit-project/rick-mailer
-repo_name: oddbit-project/rick-mailer
+site_url: https://git.oddbit.org/OddBit/rick-mailer
+repo_url: https://git.oddbit.org/OddBit/rick-mailer
+repo_name: OddBit/rick-mailer
 nav:
   - Tutorial: index.md
 

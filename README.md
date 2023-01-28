@@ -1,8 +1,6 @@
 # Rick-mailer - Library to send emails 
 
 
-[![Tests](https://github.com/oddbit-project/rick-mailer/workflows/Tests/badge.svg?branch=master)](https://github.com/oddbit-project/rick-mailer/actions)
-[![pypi](https://img.shields.io/pypi/v/rick-mailer.svg)](https://pypi.org/project/rick-mailer/)
 [![license](https://img.shields.io/pypi/l/rick-mailer.svg)](https://github.com/oddbit-project/rick-mailer/blob/master/LICENSE)
 
 
