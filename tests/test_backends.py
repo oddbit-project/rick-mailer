@@ -102,10 +102,10 @@ class BaseBackendTest(HeadersCheckMixin):
             self.flush_mailbox()
             num_sent = self.email_backend.send_messages(emails_list)
             assert num_sent == 2
-            messages = self.get_mailbox_content()
-            assert len(messages) == 2
-            assert messages[0].get_payload() == "Content1"
-            assert messages[1].get_payload() == "Content2"
+            msgs = self.get_mailbox_content()
+            assert len(msgs) == 2
+            assert msgs[0].get_payload() == "Content1"
+            assert msgs[1].get_payload() == "Content2"
             self.flush_mailbox()
 
     def test_send_verbose_name(self):
@@ -308,11 +308,16 @@ class TestConsoleBackend(BaseBackendTest):
         self.flush_mailbox()
 
     def flush_mailbox(self):
+        self.stream.truncate(0)
         self.stream.seek(0)
 
     def get_mailbox_content(self):
         messages = self.stream.getvalue().split("\n" + ("-" * 79) + "\n")
-        return [message_from_bytes(m.encode()) for m in messages if m]
+        result = []
+        for m in messages:
+            if len(m) > 0:
+                result.append(message_from_bytes(m.encode()))
+        return result
 
     def test_console_stream_kwarg(self):
         """
