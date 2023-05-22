@@ -18,7 +18,6 @@ from tests.common import HeadersCheckMixin
 
 
 class BaseBackendTest(HeadersCheckMixin):
-
     def setup_method(self, test_method):
         self.email_backend = None
 
@@ -120,7 +119,9 @@ class BaseBackendTest(HeadersCheckMixin):
         message = self.get_the_message()
         assert message["subject"] == "Subject"
         assert message.get_payload() == "Content"
-        assert message["from"] == "=?utf-8?q?Firstname_S=C3=BCrname?= <from@example.com>"
+        assert (
+            message["from"] == "=?utf-8?q?Firstname_S=C3=BCrname?= <from@example.com>"
+        )
 
     def test_plaintext_send_mail(self):
         """
@@ -128,7 +129,9 @@ class BaseBackendTest(HeadersCheckMixin):
         regression test for adding html_message parameter to send_mail()
         """
         mailer = Mailer(self.email_backend)
-        mailer.send_mail("Subject", "Content", "sender@example.com", ["nobody@example.com"])
+        mailer.send_mail(
+            "Subject", "Content", "sender@example.com", ["nobody@example.com"]
+        )
         message = self.get_the_message()
 
         assert message.get("subject") == "Subject"
@@ -190,7 +193,9 @@ class BaseBackendTest(HeadersCheckMixin):
         Regression test for #14301
         """
         mailer = Mailer(self.email_backend)
-        assert mailer.send_mail("Subject", "Content", "from@öäü.com", ["to@öäü.com"]) == 1
+        assert (
+            mailer.send_mail("Subject", "Content", "from@öäü.com", ["to@öäü.com"]) == 1
+        )
         message = self.get_the_message()
         assert message.get("subject") == "Subject"
         assert message.get("from") == "from@xn--4ca9at.com"
@@ -254,7 +259,7 @@ class TestMemBackend(BaseBackendTest):
     email_backend = None
 
     def setup_method(self, test_method):
-        self.email_backend = registry.get('mem')()
+        self.email_backend = registry.get("mem")()
 
     def teardown_method(self, test_method):
         self.flush_mailbox()
@@ -269,8 +274,8 @@ class TestMemBackend(BaseBackendTest):
         """
         Make sure that the locmen backend populates the outbox.
         """
-        connection = registry.get('mem')()
-        connection2 = registry.get('mem')()
+        connection = registry.get("mem")()
+        connection2 = registry.get("mem")()
         email = EmailMessage(
             "Subject",
             "Content",
@@ -292,11 +297,10 @@ class TestMemBackend(BaseBackendTest):
 
 
 class TestConsoleBackend(BaseBackendTest):
-
     def setup_method(self, test_method):
         self.__stdout = sys.stdout
         self.stream = sys.stdout = StringIO()
-        self.email_backend = registry.get('console')()
+        self.email_backend = registry.get("console")()
 
     def teardown_method(self, test_method):
         sys.stdout = self.__stdout
@@ -315,13 +319,8 @@ class TestConsoleBackend(BaseBackendTest):
         The console backend can be pointed at an arbitrary stream.
         """
         s = StringIO()
-        mailer = Mailer(registry.get('console')(stream=s))
-        mailer.send_mail(
-            "Subject",
-            "Content",
-            "from@example.com",
-            ["to@example.com"]
-        )
+        mailer = Mailer(registry.get("console")(stream=s))
+        mailer.send_mail("Subject", "Content", "from@example.com", ["to@example.com"])
         message = s.getvalue().split("\n" + ("-" * 79) + "\n")[0].encode()
         self.assertMessageHasHeaders(
             message,
@@ -365,7 +364,6 @@ class SMTPHandler:
 
 
 class BaseSMTPBackendTest(BaseBackendTest):
-
     def setup_method(self, test_method):
         with socket.socket() as s:
             s.bind(("127.0.0.1", 0))
@@ -376,10 +374,7 @@ class BaseSMTPBackendTest(BaseBackendTest):
             hostname="127.0.0.1",
             port=port,
         )
-        self.config = {
-                'smtp_host': '127.0.0.1',
-                'smtp_port': port
-            }
+        self.config = {"smtp_host": "127.0.0.1", "smtp_port": port}
         self.smtp_controller.start()
 
     def teardown_method(self, test_method):
@@ -387,7 +382,6 @@ class BaseSMTPBackendTest(BaseBackendTest):
 
 
 class TestSMTPBackend(BaseSMTPBackendTest):
-
     def setup_method(self, test_method):
         super().setup_method(test_method)
         self.smtp_handler.flush_mailbox()
@@ -405,8 +399,8 @@ class TestSMTPBackend(BaseSMTPBackendTest):
 
     def test_email_authentication_use_settings(self):
         cfg = self.config
-        cfg['smtp_username'] = "not empty username"
-        cfg['smtp_password'] = "not empty password"
+        cfg["smtp_username"] = "not empty username"
+        cfg["smtp_password"] = "not empty password"
 
         backend = SMTPFactory(cfg)
         assert backend.username == "not empty username"
@@ -423,8 +417,8 @@ class TestSMTPBackend(BaseSMTPBackendTest):
         to authenticate against the SMTP server.
         """
         cfg = self.config
-        cfg['smtp_username'] = "not empty username"
-        cfg['smtp_password'] = "not empty password"
+        cfg["smtp_username"] = "not empty username"
+        cfg["smtp_password"] = "not empty password"
         backend = SMTPFactory(cfg)
         with pytest.raises(SMTPException):
             with backend:
@@ -447,13 +441,13 @@ class TestSMTPBackend(BaseSMTPBackendTest):
 
     def test_email_tls_use_settings(self):
         cfg = self.config
-        cfg['smtp_use_tls'] = True
+        cfg["smtp_use_tls"] = True
         backend = SMTPFactory(cfg)
         assert backend.use_tls is True
 
     def test_email_tls_override_settings(self):
         cfg = self.config
-        cfg['smtp_use_tls'] = False
+        cfg["smtp_use_tls"] = False
         backend = SMTPFactory(cfg)
         assert backend.use_tls is False
 
@@ -464,19 +458,19 @@ class TestSMTPBackend(BaseSMTPBackendTest):
     def test_ssl_tls_mutually_exclusive(self):
         with pytest.raises(ValueError):
             cfg = self.config
-            cfg['smtp_use_ssl'] = True
-            cfg['smtp_use_tls'] = True
+            cfg["smtp_use_ssl"] = True
+            cfg["smtp_use_tls"] = True
             backend = SMTPFactory(cfg)
 
     def test_email_ssl_use_settings(self):
         cfg = self.config
-        cfg['smtp_use_ssl'] = True
+        cfg["smtp_use_ssl"] = True
         backend = SMTPFactory(cfg)
         assert backend.use_ssl is True
 
     def test_email_ssl_override_settings(self):
         cfg = self.config
-        cfg['smtp_use_ssl'] = False
+        cfg["smtp_use_ssl"] = False
         backend = SMTPFactory(cfg)
         assert backend.use_ssl is False
 
@@ -486,9 +480,9 @@ class TestSMTPBackend(BaseSMTPBackendTest):
 
     def test_email_ssl_certfile_use_settings(self):
         cfg = self.config
-        cfg['smtp_ssl_certfile'] = 'foo'
+        cfg["smtp_ssl_certfile"] = "foo"
         backend = SMTPFactory(cfg)
-        assert backend.ssl_certfile == 'foo'
+        assert backend.ssl_certfile == "foo"
 
     def test_email_ssl_certfile_default_disabled(self):
         backend = SMTPFactory(self.config)
@@ -496,9 +490,9 @@ class TestSMTPBackend(BaseSMTPBackendTest):
 
     def test_email_ssl_keyfile_use_settings(self):
         cfg = self.config
-        cfg['smtp_ssl_keyfile'] = 'foo'
+        cfg["smtp_ssl_keyfile"] = "foo"
         backend = SMTPFactory(cfg)
-        assert backend.ssl_keyfile == 'foo'
+        assert backend.ssl_keyfile == "foo"
 
     def test_email_ssl_keyfile_default_disabled(self):
         backend = SMTPFactory(self.config)
@@ -506,7 +500,7 @@ class TestSMTPBackend(BaseSMTPBackendTest):
 
     def test_email_tls_attempts_starttls(self):
         cfg = self.config
-        cfg['smtp_use_tls'] = True
+        cfg["smtp_use_tls"] = True
         backend = SMTPFactory(cfg)
         assert backend.use_tls is True
         with pytest.raises(SMTPException):
@@ -515,7 +509,7 @@ class TestSMTPBackend(BaseSMTPBackendTest):
 
     def test_email_ssl_attempts_ssl_connection(self):
         cfg = self.config
-        cfg['smtp_use_ssl'] = True
+        cfg["smtp_use_ssl"] = True
         backend = SMTPFactory(cfg)
         assert backend.use_ssl is True
         with pytest.raises(SSLError):
@@ -529,10 +523,9 @@ class TestSMTPBackend(BaseSMTPBackendTest):
     def test_connection_timeout_custom(self):
         """The timeout parameter can be customized."""
         cfg = self.config
-        cfg['smtp_timeout'] = 42
+        cfg["smtp_timeout"] = 42
         backend = SMTPFactory(cfg)
         assert backend.timeout == 42
-
 
     def test_email_msg_uses_crlf(self):
         """#23063 -- RFC-compliant messages are sent over SMTP."""
@@ -569,7 +562,6 @@ class TestSMTPBackend(BaseSMTPBackendTest):
         finally:
             SMTP.send = send
 
-
     def test_send_messages_after_open_failed(self):
         """
         send_messages() shouldn't try to send messages if open() raises an
@@ -586,12 +578,10 @@ class TestSMTPBackend(BaseSMTPBackendTest):
         )
         assert backend.send_messages([email]) == 0
 
-
     def test_send_messages_empty_list(self):
         backend = SMTPEmailBackend()
         backend.connection = object()
         assert backend.send_messages([]) == 0
-
 
     def test_send_messages_zero_sent(self):
         """A message isn't sent if it doesn't have any recipients."""

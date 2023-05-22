@@ -22,7 +22,8 @@ from rick_mailer.backends import registry
 from rick_mailer import (
     DNS_NAME,
     EmailMessage,
-    EmailMultiAlternatives, BadHeaderError,
+    EmailMultiAlternatives,
+    BadHeaderError,
 )
 from .custombackend import EmailBackend
 from .common import HeadersCheckMixin
@@ -79,7 +80,7 @@ class TestMail(HeadersCheckMixin):
         message = EmailMessage(
             "Subject", "Content", "from@example.com", cc=["cc@example.com"]
         ).message()
-        assert str(message).find('To') == -1
+        assert str(message).find("To") == -1
 
     def test_recipients_with_empty_strings(self):
         """
@@ -95,7 +96,11 @@ class TestMail(HeadersCheckMixin):
             bcc=["", "bcc@example.com"],
             reply_to=["", None],
         )
-        assert email.recipients() == ["to@example.com", "cc@example.com", "bcc@example.com"]
+        assert email.recipients() == [
+            "to@example.com",
+            "cc@example.com",
+            "bcc@example.com",
+        ]
 
     def test_cc(self):
         """Regression test for #7722"""
@@ -135,7 +140,6 @@ class TestMail(HeadersCheckMixin):
             ["to@example.com", "other@example.com"],
             cc=["cc@example.com", "cc.other@example.com"],
             bcc=["bcc@example.com"],
-
         )
         message = email.message()
         assert message["Cc"] == "cc@example.com, cc.other@example.com"
@@ -254,8 +258,10 @@ class TestMail(HeadersCheckMixin):
             ["to@example.com"],
         )
         message = email.message()
-        assert message[
-                   "Subject"].encode() == b"Long subject lines that get wrapped should contain a space continuation\n character to get expected behavior in Outlook and Thunderbird"
+        assert (
+            message["Subject"].encode()
+            == b"Long subject lines that get wrapped should contain a space continuation\n character to get expected behavior in Outlook and Thunderbird"
+        )
 
     def test_message_header_overrides(self):
         """
@@ -312,7 +318,10 @@ class TestMail(HeadersCheckMixin):
         )
         message = email.message()
         assert message["To"] == "mailing-list@example.com"
-        assert email.to == ["list-subscriber@example.com", "list-subscriber2@example.com"]
+        assert email.to == [
+            "list-subscriber@example.com",
+            "list-subscriber2@example.com",
+        ]
 
         # If we don't set the To header manually, it should default to the `to`
         # argument to the constructor.
@@ -324,8 +333,13 @@ class TestMail(HeadersCheckMixin):
         )
         message = email.message()
 
-        assert message["To"] == "list-subscriber@example.com, list-subscriber2@example.com"
-        assert email.to == ["list-subscriber@example.com", "list-subscriber2@example.com"]
+        assert (
+            message["To"] == "list-subscriber@example.com, list-subscriber2@example.com"
+        )
+        assert email.to == [
+            "list-subscriber@example.com",
+            "list-subscriber2@example.com",
+        ]
 
     def test_to_in_headers_only(self):
         message = EmailMessage(
@@ -390,7 +404,10 @@ class TestMail(HeadersCheckMixin):
             "from@example.com",
             ['"Firstname Sürname" <to@example.com>', "other@example.com"],
         )
-        assert email.message()["To"] == "=?utf-8?q?Firstname_S=C3=BCrname?= <to@example.com>, other@example.com"
+        assert (
+            email.message()["To"]
+            == "=?utf-8?q?Firstname_S=C3=BCrname?= <to@example.com>, other@example.com"
+        )
 
         email = EmailMessage(
             "Subject",
@@ -398,7 +415,10 @@ class TestMail(HeadersCheckMixin):
             "from@example.com",
             ['"Sürname, Firstname" <to@example.com>', "other@example.com"],
         )
-        assert email.message()["To"] == "=?utf-8?q?S=C3=BCrname=2C_Firstname?= <to@example.com>, other@example.com"
+        assert (
+            email.message()["To"]
+            == "=?utf-8?q?S=C3=BCrname=2C_Firstname?= <to@example.com>, other@example.com"
+        )
 
     def test_unicode_headers(self):
         email = EmailMessage(
@@ -413,7 +433,10 @@ class TestMail(HeadersCheckMixin):
         )
         message = email.message()
         assert message["Subject"] == "=?utf-8?b?R8W8ZWfFvMOzxYJrYQ==?="
-        assert message["Sender"] == "=?utf-8?q?Firstname_S=C3=BCrname?= <sender@example.com>"
+        assert (
+            message["Sender"]
+            == "=?utf-8?q?Firstname_S=C3=BCrname?= <sender@example.com>"
+        )
         assert message["Comments"] == "=?utf-8?q?My_S=C3=BCrname_is_non-ASCII?="
 
     def test_safe_mime_multipart(self):
@@ -434,8 +457,14 @@ class TestMail(HeadersCheckMixin):
         )
         msg.attach_alternative(html_content, "text/html")
         msg.encoding = "iso-8859-1"
-        assert msg.message()["To"] == "=?iso-8859-1?q?S=FCrname=2C_Firstname?= <to@example.com>"
-        assert msg.message()["Subject"] == "=?iso-8859-1?q?Message_from_Firstname_S=FCrname?="
+        assert (
+            msg.message()["To"]
+            == "=?iso-8859-1?q?S=FCrname=2C_Firstname?= <to@example.com>"
+        )
+        assert (
+            msg.message()["Subject"]
+            == "=?iso-8859-1?q?Message_from_Firstname_S=FCrname?="
+        )
 
     def test_safe_mime_multipart_with_attachments(self):
         """
@@ -505,7 +534,10 @@ class TestMail(HeadersCheckMixin):
                 ("Content-Transfer-Encoding", "quoted-printable"),
             },
         )
-        assert payload0.as_bytes().endswith(b"\n\nFirstname S=FCrname is a great guy.") is True
+        assert (
+            payload0.as_bytes().endswith(b"\n\nFirstname S=FCrname is a great guy.")
+            is True
+        )
 
         payload1 = msg.message().get_payload(1)
         self.assertMessageHasHeaders(
@@ -516,7 +548,12 @@ class TestMail(HeadersCheckMixin):
                 ("Content-Transfer-Encoding", "quoted-printable"),
             },
         )
-        assert payload1.as_bytes().endswith(b"\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>") is True
+        assert (
+            payload1.as_bytes().endswith(
+                b"\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>"
+            )
+            is True
+        )
 
     def test_attachments(self):
         """Regression test for #9367"""
@@ -582,7 +619,7 @@ class TestMail(HeadersCheckMixin):
         )
         test_mimetypes = ["text/plain", "image/png", None]
 
-        connection = registry.get('testing')()
+        connection = registry.get("testing")()
         for basename, real_mimetype in files:
             for mimetype in test_mimetypes:
                 email = EmailMessage(
@@ -600,7 +637,7 @@ class TestMail(HeadersCheckMixin):
                 assert msgs_sent_num == 1
 
     def test_attach_text_as_bytes(self):
-        connection = registry.get('testing')()
+        connection = registry.get("testing")()
         msg = EmailMessage("subject", "body", "from@example.com", ["to@example.com"])
         msg.attach("file.txt", b"file content")
         sent_num = msg.send(connection)
@@ -658,12 +695,12 @@ class TestMail(HeadersCheckMixin):
         Make sure that get_connection() accepts arbitrary keyword that might be
         used with custom backends.
         """
-        c = registry.get('testing')(fail_silently=True, foo="bar")
+        c = registry.get("testing")(fail_silently=True, foo="bar")
         assert c.fail_silently is True
 
     def test_custom_backend(self):
         """Test custom backend defined in this suite."""
-        conn = registry.get('testing')()
+        conn = registry.get("testing")()
         assert hasattr(conn, "test_outbox") is True
         email = EmailMessage(
             "Subject",
@@ -677,21 +714,16 @@ class TestMail(HeadersCheckMixin):
 
     def test_backend_arg(self):
         """Test backend argument of mail.get_connection()"""
-        assert isinstance(registry.get('smtp')(), SMTPEmailBackend) is True
-        assert isinstance(registry.get('mem')(), MemEmailBackend) is True
-        assert isinstance(registry.get('console')(), ConsoleEmailBackend) is True
+        assert isinstance(registry.get("smtp")(), SMTPEmailBackend) is True
+        assert isinstance(registry.get("mem")(), MemEmailBackend) is True
+        assert isinstance(registry.get("console")(), ConsoleEmailBackend) is True
 
     def test_connection_arg(self):
         """Test connection argument to send_mail(), et. al."""
         # Send using non-default connection
-        connection = registry.get('testing')()
+        connection = registry.get("testing")()
         mailer = mail.Mailer(connection)
-        mailer.send_mail(
-            "Subject",
-            "Content",
-            "from@example.com",
-            ["to@example.com"]
-        )
+        mailer.send_mail("Subject", "Content", "from@example.com", ["to@example.com"])
         assert len(connection.test_outbox) == 1
         assert connection.test_outbox[0].subject == "Subject"
 
@@ -847,95 +879,95 @@ class TestMail(HeadersCheckMixin):
     def test_sanitize_address(self):
         """Email addresses are properly sanitized."""
         for email_address, encoding, expected_result in (
-                # ASCII addresses.
-                ("to@example.com", "ascii", "to@example.com"),
-                ("to@example.com", "utf-8", "to@example.com"),
-                (("A name", "to@example.com"), "ascii", "A name <to@example.com>"),
-                (
-                        ("A name", "to@example.com"),
-                        "utf-8",
-                        "A name <to@example.com>",
-                ),
-                ("localpartonly", "ascii", "localpartonly"),
-                # ASCII addresses with display names.
-                ("A name <to@example.com>", "ascii", "A name <to@example.com>"),
-                ("A name <to@example.com>", "utf-8", "A name <to@example.com>"),
-                ('"A name" <to@example.com>', "ascii", "A name <to@example.com>"),
-                ('"A name" <to@example.com>', "utf-8", "A name <to@example.com>"),
-                # Unicode addresses (supported per RFC-6532).
-                ("tó@example.com", "utf-8", "=?utf-8?b?dMOz?=@example.com"),
-                ("to@éxample.com", "utf-8", "to@xn--xample-9ua.com"),
-                (
-                        ("Tó Example", "tó@example.com"),
-                        "utf-8",
-                        "=?utf-8?q?T=C3=B3_Example?= <=?utf-8?b?dMOz?=@example.com>",
-                ),
-                # Unicode addresses with display names.
-                (
-                        "Tó Example <tó@example.com>",
-                        "utf-8",
-                        "=?utf-8?q?T=C3=B3_Example?= <=?utf-8?b?dMOz?=@example.com>",
-                ),
-                (
-                        "To Example <to@éxample.com>",
-                        "ascii",
-                        "To Example <to@xn--xample-9ua.com>",
-                ),
-                (
-                        "To Example <to@éxample.com>",
-                        "utf-8",
-                        "To Example <to@xn--xample-9ua.com>",
-                ),
-                # Addresses with two @ signs.
-                ('"to@other.com"@example.com', "utf-8", r'"to@other.com"@example.com'),
-                (
-                        '"to@other.com" <to@example.com>',
-                        "utf-8",
-                        '"to@other.com" <to@example.com>',
-                ),
-                (
-                        ("To Example", "to@other.com@example.com"),
-                        "utf-8",
-                        'To Example <"to@other.com"@example.com>',
-                ),
-                # Addresses with long unicode display names.
-                (
-                        "Tó Example very long" * 4 + " <to@example.com>",
-                        "utf-8",
-                        "=?utf-8?q?T=C3=B3_Example_very_longT=C3=B3_Example_very_longT"
-                        "=C3=B3_Example_?=\n"
-                        " =?utf-8?q?very_longT=C3=B3_Example_very_long?= "
-                        "<to@example.com>",
-                ),
-                (
-                        ("Tó Example very long" * 4, "to@example.com"),
-                        "utf-8",
-                        "=?utf-8?q?T=C3=B3_Example_very_longT=C3=B3_Example_very_longT"
-                        "=C3=B3_Example_?=\n"
-                        " =?utf-8?q?very_longT=C3=B3_Example_very_long?= "
-                        "<to@example.com>",
-                ),
-                # Address with long display name and unicode domain.
-                (
-                        ("To Example very long" * 4, "to@exampl€.com"),
-                        "utf-8",
-                        "To Example very longTo Example very longTo Example very longT"
-                        "o Example very\n"
-                        " long <to@xn--exampl-nc1c.com>",
-                ),
+            # ASCII addresses.
+            ("to@example.com", "ascii", "to@example.com"),
+            ("to@example.com", "utf-8", "to@example.com"),
+            (("A name", "to@example.com"), "ascii", "A name <to@example.com>"),
+            (
+                ("A name", "to@example.com"),
+                "utf-8",
+                "A name <to@example.com>",
+            ),
+            ("localpartonly", "ascii", "localpartonly"),
+            # ASCII addresses with display names.
+            ("A name <to@example.com>", "ascii", "A name <to@example.com>"),
+            ("A name <to@example.com>", "utf-8", "A name <to@example.com>"),
+            ('"A name" <to@example.com>', "ascii", "A name <to@example.com>"),
+            ('"A name" <to@example.com>', "utf-8", "A name <to@example.com>"),
+            # Unicode addresses (supported per RFC-6532).
+            ("tó@example.com", "utf-8", "=?utf-8?b?dMOz?=@example.com"),
+            ("to@éxample.com", "utf-8", "to@xn--xample-9ua.com"),
+            (
+                ("Tó Example", "tó@example.com"),
+                "utf-8",
+                "=?utf-8?q?T=C3=B3_Example?= <=?utf-8?b?dMOz?=@example.com>",
+            ),
+            # Unicode addresses with display names.
+            (
+                "Tó Example <tó@example.com>",
+                "utf-8",
+                "=?utf-8?q?T=C3=B3_Example?= <=?utf-8?b?dMOz?=@example.com>",
+            ),
+            (
+                "To Example <to@éxample.com>",
+                "ascii",
+                "To Example <to@xn--xample-9ua.com>",
+            ),
+            (
+                "To Example <to@éxample.com>",
+                "utf-8",
+                "To Example <to@xn--xample-9ua.com>",
+            ),
+            # Addresses with two @ signs.
+            ('"to@other.com"@example.com', "utf-8", r'"to@other.com"@example.com'),
+            (
+                '"to@other.com" <to@example.com>',
+                "utf-8",
+                '"to@other.com" <to@example.com>',
+            ),
+            (
+                ("To Example", "to@other.com@example.com"),
+                "utf-8",
+                'To Example <"to@other.com"@example.com>',
+            ),
+            # Addresses with long unicode display names.
+            (
+                "Tó Example very long" * 4 + " <to@example.com>",
+                "utf-8",
+                "=?utf-8?q?T=C3=B3_Example_very_longT=C3=B3_Example_very_longT"
+                "=C3=B3_Example_?=\n"
+                " =?utf-8?q?very_longT=C3=B3_Example_very_long?= "
+                "<to@example.com>",
+            ),
+            (
+                ("Tó Example very long" * 4, "to@example.com"),
+                "utf-8",
+                "=?utf-8?q?T=C3=B3_Example_very_longT=C3=B3_Example_very_longT"
+                "=C3=B3_Example_?=\n"
+                " =?utf-8?q?very_longT=C3=B3_Example_very_long?= "
+                "<to@example.com>",
+            ),
+            # Address with long display name and unicode domain.
+            (
+                ("To Example very long" * 4, "to@exampl€.com"),
+                "utf-8",
+                "To Example very longTo Example very longTo Example very longT"
+                "o Example very\n"
+                " long <to@xn--exampl-nc1c.com>",
+            ),
         ):
             assert sanitize_address(email_address, encoding) == expected_result
 
     def test_sanitize_address_invalid(self):
         for email_address in (
-                # Invalid address with two @ signs.
-                "to@other.com@example.com",
-                # Invalid address without the quotes.
-                "to@other.com <to@example.com>",
-                # Other invalid addresses.
-                "@",
-                "to@",
-                "@example.com",
+            # Invalid address with two @ signs.
+            "to@other.com@example.com",
+            # Invalid address without the quotes.
+            "to@other.com <to@example.com>",
+            # Other invalid addresses.
+            "@",
+            "to@",
+            "@example.com",
         ):
             with pytest.raises(ValueError):
                 sanitize_address(email_address, encoding="utf-8")
@@ -962,7 +994,6 @@ class TestMail(HeadersCheckMixin):
 
 
 class TestMailTimeZone:
-
     def test_date_header_utc(self):
         """
         Datetime should be in UTC.

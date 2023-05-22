@@ -2,7 +2,6 @@ from email import message_from_bytes
 
 
 class HeadersCheckMixin:
-
     def assertMessageHasHeaders(self, message, headers):
         """
         Asserts that the `message` has all `headers`.

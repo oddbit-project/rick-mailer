@@ -3,7 +3,7 @@
 from rick_mailer.backends import BaseEmailBackend, registry
 
 
-@registry.register('testing')
+@registry.register("testing")
 class EmailBackend(BaseEmailBackend):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
