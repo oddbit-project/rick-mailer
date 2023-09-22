@@ -80,7 +80,7 @@ class TestMail(HeadersCheckMixin):
         message = EmailMessage(
             "Subject", "Content", "from@example.com", cc=["cc@example.com"]
         ).message()
-        assert str(message).find("To") == -1
+        assert "To" not in str(message)
 
     def test_recipients_with_empty_strings(self):
         """
@@ -714,9 +714,9 @@ class TestMail(HeadersCheckMixin):
 
     def test_backend_arg(self):
         """Test backend argument of mail.get_connection()"""
-        assert isinstance(registry.get("smtp")(), SMTPEmailBackend) is True
-        assert isinstance(registry.get("mem")(), MemEmailBackend) is True
-        assert isinstance(registry.get("console")(), ConsoleEmailBackend) is True
+        assert isinstance(registry.get("smtp")(), SMTPEmailBackend)
+        assert isinstance(registry.get("mem")(), MemEmailBackend)
+        assert isinstance(registry.get("console")(), ConsoleEmailBackend)
 
     def test_connection_arg(self):
         """Test connection argument to send_mail(), et. al."""

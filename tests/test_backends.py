@@ -313,11 +313,7 @@ class TestConsoleBackend(BaseBackendTest):
 
     def get_mailbox_content(self):
         messages = self.stream.getvalue().split("\n" + ("-" * 79) + "\n")
-        result = []
-        for m in messages:
-            if len(m) > 0:
-                result.append(message_from_bytes(m.encode()))
-        return result
+        return [message_from_bytes(m.encode()) for m in messages if len(m) > 0]
 
     def test_console_stream_kwarg(self):
         """
