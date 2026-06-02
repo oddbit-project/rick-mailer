@@ -28,7 +28,6 @@ __all__ = [
     "forbid_multi_line_headers",
     "Mailer",
     "SMTPFactory",
-    "Mailer",
 ]
 
 

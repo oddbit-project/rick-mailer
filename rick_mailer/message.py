@@ -102,6 +102,8 @@ def sanitize_address(addr, encoding):
             domain = token.domain or ""
     else:
         nm, address = addr
+        if "@" not in address:
+            raise ValueError('Invalid address "%s"' % address)
         localpart, domain = address.rsplit("@", 1)
 
     address_parts = nm + localpart + domain
@@ -263,7 +265,9 @@ class EmailMessage:
         msg = SafeMIMEText(self.body, self.content_subtype, encoding)
         msg = self._create_message(msg)
         msg["Subject"] = self.subject
-        msg["From"] = self.extra_headers.get("From", self.from_email)
+        from_email = self.extra_headers.get("From", self.from_email)
+        if from_email:
+            msg["From"] = from_email
         self._set_list_header_if_not_empty(msg, "To", self.to)
         self._set_list_header_if_not_empty(msg, "Cc", self.cc)
         self._set_list_header_if_not_empty(msg, "Reply-To", self.reply_to)
