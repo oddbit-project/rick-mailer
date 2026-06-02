@@ -32,6 +32,10 @@ mailer = Mailer(conn)
 mailer.send_mail('some subject', 'message contents', 'noreply@localhost', ['user1@domain.tld', 'user2@domain.tld'])
 ```
 
+> **Security note:** `smtp_use_tls` and `smtp_use_ssl` default to `False`. When sending credentials
+> (`smtp_username`/`smtp_password`), enable one of them (`smtp_use_tls=True` for STARTTLS, or
+> `smtp_use_ssl=True` for an implicit TLS connection) so the password is not transmitted in cleartext.
+
 ## Related tools
 
 Check out [MailHog](https://github.com/mailhog/MailHog), a mail testing tool for developers.

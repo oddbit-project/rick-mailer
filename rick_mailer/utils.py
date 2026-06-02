@@ -56,11 +56,8 @@ def force_str(s, encoding="utf-8", strings_only=False, errors="strict"):
         return s
     if strings_only and is_protected_type(s):
         return s
-    try:
-        if isinstance(s, bytes):
-            s = str(s, encoding, errors)
-        else:
-            s = str(s)
-    except UnicodeDecodeError as e:
-        raise e
-    return
+    if isinstance(s, bytes):
+        s = str(s, encoding, errors)
+    else:
+        s = str(s)
+    return s
