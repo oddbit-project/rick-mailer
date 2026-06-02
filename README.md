@@ -54,7 +54,7 @@ mailer.send_mail('some subject', 'message contents', 'noreply@localhost', ['user
 
 ## Related tools
 
-Check out [MailHog](https://github.com/mailhog/MailHog), a mail testing tool for developers.
+Check out [Mailpit](https://github.com/axllent/mailpit), a mail testing tool for developers.
 
 ## License
 As rick_mailer is mostly Django code, it is licensed under Django license and copyright - see the included [License file](LICENSE).
